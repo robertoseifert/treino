@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Treinos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+            animation: fadeIn 0.8s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+            position: relative;
+        }
+        h1::after {
+            content: '';
+            width: 60px;
+            height: 4px;
+            background-color: #3498db;
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            background-color: #fff;
+            outline: none;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(52, 152, 219, 0.4);
+        }
+        .response-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+        .response-message.success {
+            background-color: #e6ffe6;
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+        .response-message.error {
+            background-color: #ffe6e6;
+            color: #c0392b;
+            border: 1px solid #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gerador de Treinos</h1>
+        <form id="trainingForm">
+            <div class="form-group">
+                <label for="nomeAluno">Nome do Aluno:</label>
+                <input type="text" id="nomeAluno" name="nomeAluno" required>
+            </div>
+
+            <div class="form-group">
+                <label for="emailAluno">Email do Aluno:</label>
+                <input type="email" id="emailAluno" name="emailAluno" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nomeTreinador">Nome do Treinador:</label>
+                <select id="nomeTreinador" name="nomeTreinador" required>
+                    <option value="">Selecione um treinador</option>
+                    <option value="Jeovan">Jeovan</option>
+                    <option value="André">André</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="solicitacaoTreino">Solicitação de Treino para a IA:</label>
+                <textarea id="solicitacaoTreino" name="solicitacaoTreino" placeholder="Ex: Treino de hipertrofia para iniciantes, 3x semana, foco em membros superiores e inferiores." required></textarea>
+            </div>
+
+            <div class="button-container">
+                <button type="submit">Enviar Solicitação</button>
+            </div>
+            <div id="responseMessage" class="response-message"></div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('trainingForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const webhookUrl = 'https://n8n.srv1149367.hstgr.cloud/webhook/37a6205a-e37f-44ed-bf98-851829bc1f84';
+            const responseMessageDiv = document.getElementById('responseMessage');
+
+            const formData = {
+                nomeAluno: document.getElementById('nomeAluno').value,
+                emailAluno: document.getElementById('emailAluno').value,
+                nomeTreinador: document.getElementById('nomeTreinador').value,
+                solicitacaoTreino: document.getElementById('solicitacaoTreino').value
+            };
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    responseMessageDiv.classList.remove('error');
+                    responseMessageDiv.classList.add('success');
+                    responseMessageDiv.textContent = 'Solicitação enviada com sucesso! O treinador entrará em contato.';
+                    document.getElementById('trainingForm').reset(); // Limpa o formulário
+                } else {
+                    const errorData = await response.json();
+                    responseMessageDiv.classList.remove('success');
+                    responseMessageDiv.classList.add('error');
+                    responseMessageDiv.textContent = `Erro ao enviar solicitação: ${errorData.message || response.statusText}`;
+                }
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                responseMessageDiv.classList.remove('success');
+                responseMessageDiv.classList.add('error');
+                responseMessageDiv.textContent = 'Erro de conexão. Por favor, tente novamente.';
+            } finally {
+                responseMessageDiv.style.display = 'block';
+                // Esconde a mensagem após alguns segundos
+                setTimeout(() => {
+                    responseMessageDiv.style.display = 'none';
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
