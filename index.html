@@ -142,6 +142,11 @@
             </div>
 
             <div class="form-group">
+                <label for="corpoEmail">Corpo do Email:</label>
+                <textarea id="corpoEmail" name="corpoEmail" required>segue seu treino!</textarea>
+            </div>
+
+            <div class="form-group">
                 <label for="nomeTreinador">Nome do Treinador:</label>
                 <select id="nomeTreinador" name="nomeTreinador" required>
                     <option value="">Selecione um treinador</option>
@@ -173,6 +178,7 @@
             const formData = {
                 nomeAluno: document.getElementById('nomeAluno').value,
                 emailAluno: document.getElementById('emailAluno').value,
+                corpoEmail: document.getElementById('corpoEmail').value,
                 nomeTreinador: document.getElementById('nomeTreinador').value,
                 solicitacaoTreino: document.getElementById('solicitacaoTreino').value
             };
